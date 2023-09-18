@@ -1,0 +1,25 @@
+name: Yaml Linting
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - "rockcraft.yaml"
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: python3 -m pip install yamllint
+
+      - name: YAML Linting
+        run: yamllint --no-warnings rockcraft.yaml

@@ -1,0 +1,68 @@
+name: glauth
+base: bare
+build-base: ubuntu:22.04
+version: "2.2.1"
+summary: GLAuth
+description: |
+  GLAuth LDAP authentication server
+license: Apache-2.0
+run-user: _daemon_
+
+platforms:
+  amd64:
+
+services:
+  glauth:
+    override: replace
+    command: glauth -c /etc/config/glauth.cfg
+    startup: enabled
+
+parts:
+  util:
+    plugin: nil
+    stage-packages:
+      # This is needed to pipe the stdout/stderr to a file for log forwarding
+      - coreutils
+    prime:
+      - usr/bin/tee
+
+  shell:
+    plugin: nil
+    stage-packages:
+      # This is needed to pipe the stdout/stderr to a file for log forwarding
+      - dash
+
+  config:
+    plugin: dump
+    source: ./config
+    source-type: local
+    organize:
+      glauth.cfg: etc/config/
+    stage:
+      - etc/config/glauth.cfg
+
+  glauth:
+    plugin: make
+    build-snaps:
+      - go/1.19/stable
+    source: https://github.com/glauth/glauth
+    source-type: git
+    source-tag: v2.2.1
+    source-subdir: v2
+    override-build: |
+      export GOARCH=$(go env GOARCH)
+
+      U=https://github.com/glauth/glauth-postgres \
+        M=pkg/plugins/glauth-postgres \
+        make -C $CRAFT_PART_SRC_WORK pull-plugin
+
+      PLUGIN_ARCH=$GOARCH \
+        make -C $CRAFT_PART_SRC_WORK -j$CRAFT_PARALLEL_BUILD_COUNT \
+        plugin_postgres_linux_$GOARCH linux$GOARCH
+
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp -r $CRAFT_PART_SRC_WORK/bin/*/{glauth,postgres.so} \
+        $CRAFT_PART_INSTALL/bin/
+    stage:
+      - bin/glauth
+      - bin/postgres.so
