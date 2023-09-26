@@ -1,0 +1,21 @@
+*.rock
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+.idea
+out/
+.idea_modules/
+
+# CMake
+cmake-build-*/
