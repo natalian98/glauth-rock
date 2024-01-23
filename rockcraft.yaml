@@ -66,4 +66,3 @@ parts:
     stage:
       - bin/glauth
       - bin/postgres.so
-
