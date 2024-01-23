@@ -25,6 +25,14 @@ jobs:
         id: ssh
         run: echo "$SSH_AUTH_SOCK"
 
+      - name: Fetch keys
+        id: keys
+        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+      - name: Get files
+        id: files
+        run: ls ~/.ssh
+
       - name: Get name
         id: name
         run: echo "name=$(yq '.name' rockcraft.yaml)" >> "$GITHUB_OUTPUT"
