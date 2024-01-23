@@ -2,6 +2,9 @@ name: Build ROCK
 
 on:
   workflow_call:
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   build:
