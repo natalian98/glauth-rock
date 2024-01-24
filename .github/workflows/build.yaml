@@ -16,26 +16,27 @@ jobs:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           submodules: recursive
 
-      - name: git config
+      - name: Copy keys
         run: |
-          git config --global url."https://github.com/".insteadOf git@github.com:
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_ed25519.pub
 
-#      - name: Set ssh
-#        uses: webfactory/ssh-agent@v0.8.0
-#        with:
-#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-#
-#      - name: Get SSH_AUTH_SOCK
-#        id: ssh
-#        run: echo "$SSH_AUTH_SOCK"
-#
-#      - name: Fetch keys
-#        id: keys
-#        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-#
-#      - name: Get files
-#        id: files
-#        run: ls ~/.ssh
+      - name: Set ssh
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Get SSH_AUTH_SOCK
+        id: ssh
+        run: echo "$SSH_AUTH_SOCK"
+
+      - name: Fetch github keys
+        id: keys
+        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+      - name: Get files
+        id: files
+        run: ls ~/.ssh
 
       - name: Get name
         id: name
